@@ -10,8 +10,8 @@ environment:
 dependencies:
   usage: ^4.1.1
   tool_base:
-    # git: https://github.com/DrBu7cher/tool_base.git
-    path: /home/jbadstuebner/Dokumente/git/github.com/DrBu7cher/tool_base/main
+    git: https://github.com/DrBu7cher/tool_base.git
+    # path: /home/jbadstuebner/Dokumente/git/github.com/DrBu7cher/tool_base/main
   http: ^0.13.5
 
 dev_dependencies:
@@ -19,8 +19,8 @@ dev_dependencies:
   test: ^1.24.1
   mockito: ^5.4.0
   tool_base_test:
-    # git: https://github.com/DrBu7cher/tool_base_test.git
-    path: /home/jbadstuebner/Dokumente/git/github.com/DrBu7cher/tool_base_test/main
+    git: https://github.com/DrBu7cher/tool_base_test.git
+    # path: /home/jbadstuebner/Dokumente/git/github.com/DrBu7cher/tool_base_test/main
   args: ^2.4.0
   quiver: ^3.2.1
   meta: ^1.9.1
