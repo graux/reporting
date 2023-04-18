@@ -85,14 +85,14 @@ class CrashReportSender {
 //        client, crashServerHost, crashEndpointPath, productId);
 //  }
 
-  http.Client _client;
-   Usage get _usage => Usage.instance;
-  String _crashServerHost;
-  String _crashEndpointPath;
-  String _productId;
+  late http.Client _client;
+  Usage get _usage => Usage.instance;
+  late String _crashServerHost;
+  late String _crashEndpointPath;
+  late String _productId;
 
   Uri get _baseUrl {
-    final String overrideUrl =
+    final String? overrideUrl =
         platform.environment['SYLPH_CRASH_SERVER_BASE_URL'];
 
     if (overrideUrl != null) {
@@ -112,10 +112,10 @@ class CrashReportSender {
   ///
   /// The report is populated from data in [error] and [stackTrace].
   Future<void> sendReport({
-    @required dynamic error,
-    @required StackTrace stackTrace,
-    @required String getFlutterVersion(),
-    @required String command,
+    required dynamic error,
+    required StackTrace stackTrace,
+    required String getFlutterVersion(),
+    required String command,
   }) async {
     try {
       final String flutterVersion = getFlutterVersion();

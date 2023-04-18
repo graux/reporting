@@ -166,7 +166,9 @@ class SylphCommandRunner extends CommandRunner<void> {
     final bool useWrapping = topLevelResults.wasParsed('wrap')
         ? topLevelResults['wrap']
 //        : io.stdio.terminalColumns == null ? false : topLevelResults['wrap'];
-        : stdio.terminalColumns == null ? false : topLevelResults['wrap'];
+        : stdio.terminalColumns == null
+            ? false
+            : topLevelResults['wrap'];
     contextOverrides[OutputPreferences] = OutputPreferences(
       wrapText: useWrapping,
       showColor: topLevelResults['color'],
@@ -257,7 +259,8 @@ class SylphCommandRunner extends CommandRunner<void> {
     );
   }
 }
-CommandRunner<void> createTestCommandRunner([SylphCommand command]) {
+
+CommandRunner<void> createTestCommandRunner([SylphCommand? command]) {
   final SylphCommandRunner runner = SylphCommandRunner();
   if (command != null) runner.addCommand(command);
   return runner;

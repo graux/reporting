@@ -19,17 +19,17 @@ enum ExitStatus {
 /// analytics.
 class SylphCommandResult {
   const SylphCommandResult(
-      this.exitStatus, {
-        this.timingLabelParts,
-        this.endTimeOverride,
-      });
+    this.exitStatus, {
+    this.timingLabelParts,
+    this.endTimeOverride,
+  });
 
   final ExitStatus exitStatus;
 
   /// Optional data that can be appended to the timing event.
   /// https://developers.google.com/analytics/devguides/collection/analyticsjs/field-reference#timingLabel
   /// Do not add PII.
-  final List<String> timingLabelParts;
+  final List<String>? timingLabelParts;
 
   /// Optional epoch time when the command's non-interactive wait time is
   /// complete during the command's execution. Use to measure user perceivable
@@ -37,7 +37,7 @@ class SylphCommandResult {
   ///
   /// [SylphCommand] will automatically measure and report the command's
   /// complete time if not overridden.
-  final DateTime endTimeOverride;
+  final DateTime? endTimeOverride;
 
   @override
   String toString() {
@@ -50,14 +50,14 @@ class SylphCommandResult {
         return 'fail';
       default:
         assert(false);
-        return null;
+        return 'null';
     }
   }
 }
 
 /// An event that reports the result of a top-level command.
 class CommandResultEvent extends UsageEvent {
-  CommandResultEvent(String commandPath, SylphCommandResult result)
+  CommandResultEvent(String commandPath, SylphCommandResult? result)
       : super(commandPath, result?.toString() ?? 'unspecified');
 }
 
@@ -72,18 +72,18 @@ abstract class SylphCommand extends Command<void> {
   final ArgParser _argParser = ArgParser(
     allowTrailingOptions: false,
     usageLineLength:
-    outputPreferences.wrapText ? outputPreferences.wrapColumn : null,
+        outputPreferences.wrapText ? outputPreferences.wrapColumn : null,
   );
 
   @override
-  SylphCommandRunner get runner => super.runner;
+  CommandRunner<void>? get runner => super.runner;
 
   /// The path to send to Google Analytics. Return null here to disable
   /// tracking of the command.
-  Future<String> get usagePath async {
-    if (parent is SylphCommand) {
-      final SylphCommand commandParent = parent;
-      final String path = await commandParent.usagePath;
+  Future<String?> get usagePath async {
+    if (parent is SylphCommand?) {
+      final SylphCommand? commandParent = parent as SylphCommand;
+      final String? path = await commandParent?.usagePath;
       // Don't report for parents that return null for usagePath.
       return path == null ? null : '$path/$name';
     } else {
@@ -92,8 +92,7 @@ abstract class SylphCommand extends Command<void> {
   }
 
   /// Additional usage values to be sent with the usage ping.
-  Future<Map<String, String>> get usageValues async =>
-      const <String, String>{};
+  Future<Map<String, String>> get usageValues async => const <String, String>{};
 
   /// Runs this command.
   ///
@@ -112,8 +111,8 @@ abstract class SylphCommand extends Command<void> {
         if (sylphUsage.isFirstRun) {
           sylphUsage.printWelcome();
         }
-        final String commandPath = await usagePath;
-        SylphCommandResult commandResult;
+        final String? commandPath = await usagePath;
+        SylphCommandResult? commandResult;
         try {
           commandResult = await verifyThenRunCommand(commandPath);
         } on ToolExit {
@@ -135,7 +134,7 @@ abstract class SylphCommand extends Command<void> {
   ///
   /// For example, the command path (e.g. `build/apk`) and the result,
   /// as well as the time spent running it.
-  void _sendPostUsage(String commandPath, SylphCommandResult commandResult,
+  void _sendPostUsage(String? commandPath, SylphCommandResult? commandResult,
       DateTime startTime, DateTime endTime) {
     if (commandPath == null) {
       return;
@@ -147,13 +146,13 @@ abstract class SylphCommand extends Command<void> {
     // Send timing.
     final List<String> labels = <String>[
       if (commandResult?.exitStatus != null)
-        getEnumName(commandResult.exitStatus),
+        getEnumName(commandResult!.exitStatus),
       if (commandResult?.timingLabelParts?.isNotEmpty ?? false)
-        ...commandResult.timingLabelParts,
+        ...?commandResult!.timingLabelParts,
     ];
 
     final String label =
-    labels.where((String label) => !isBlank(label)).join('-');
+        labels.where((String label) => !isBlank(label)).join('-');
     sylphUsage.sendTiming(
       'flutter',
       name,
@@ -174,16 +173,15 @@ abstract class SylphCommand extends Command<void> {
   /// then call this method to execute the command
   /// rather than calling [runCommand] directly.
   @mustCallSuper
-  Future<SylphCommandResult> verifyThenRunCommand(String commandPath) async {
+  Future<SylphCommandResult?> verifyThenRunCommand(String? commandPath) async {
     await validateCommand();
 
     if (commandPath != null) {
-      final Map<String, String> additionalUsageValues =
-      <String, String>{
-        ...?await usageValues,
+      final Map<String, String> additionalUsageValues = <String, String>{
+        ...await usageValues,
         customDimensions.commandHasTerminal:
 //        io.stdout.hasTerminal ? 'true' : 'false',
-        stdio.hasTerminal ? 'true' : 'false',
+            stdio.hasTerminal ? 'true' : 'false',
       };
       Usage.command(commandPath, parameters: additionalUsageValues);
     }
@@ -194,13 +192,12 @@ abstract class SylphCommand extends Command<void> {
   /// Subclasses must implement this to execute the command.
   /// Optionally provide a [SylphCommandResult] to send more details about the
   /// execution for analytics.
-  Future<SylphCommandResult> runCommand();
+  Future<SylphCommandResult?> runCommand();
 
   @protected
   @mustCallSuper
   Future<void> validateCommand() async {}
 }
-
 
 class DevicesCommand extends SylphCommand {
   DevicesCommand() {
@@ -223,10 +220,11 @@ class DevicesCommand extends SylphCommand {
   final String description = 'List available devices.';
 
   @override
-  String get invocation => '${runner.executableName} $name <one or more paths>';
+  String get invocation =>
+      '${runner?.executableName} $name <one or more paths>';
 
   @override
-  Future<SylphCommandResult> runCommand() async {
+  Future<SylphCommandResult?> runCommand() async {
 //    switch (deviceType) {
 //      case 'all':
 //        printDeviceFarmDevices(getDeviceFarmDevices());
@@ -246,13 +244,13 @@ class DevicesCommand extends SylphCommand {
   }
 
   String get deviceType {
-    if (argResults.wasParsed('devices'))
-      return argResults['devices'];
-    else if (argResults.rest.isNotEmpty) {
-      final String deviceTypeArg = argResults.rest.first;
+    if (argResults?.wasParsed('devices') ?? false)
+      return argResults!['devices'];
+    else if (argResults?.rest.isNotEmpty ?? false) {
+      final String deviceTypeArg = argResults!.rest.first;
       final String deviceType =
-      deviceTypes.firstWhere((d) => d == deviceTypeArg, orElse: () => null);
-      if (deviceType == null)
+          deviceTypes.firstWhere((d) => d == deviceTypeArg, orElse: () => "");
+      if (deviceType == "")
         throwToolExit(
             '"$deviceTypeArg" is not an allowed value for option "devices".',
             exitCode: 1);
@@ -260,7 +258,7 @@ class DevicesCommand extends SylphCommand {
         return deviceType;
     }
     throwToolExit('Unexpected');
-    return null;
+    return "null";
   }
 
 //  void printDeviceFarmDevices(List<DeviceFarmDevice> deviceFarmDevices) {

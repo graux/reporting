@@ -72,10 +72,11 @@ abstract class Dimensions {
 //    'sessionHostOsDetails':'cd1' ,
 //    'localTime':'cd2'
 //  };
-  Map<String, String> dimensions;
+  Map<String, String>? dimensions;
 
   void validate() {
-    dimensions.forEach((k, v) {
+    if (dimensions == null) throw 'dimensions is null!';
+    dimensions!.forEach((k, v) {
       if (_reservedDimensions.containsKey(k) ||
           _reservedDimensions.containsValue(v)) {
         throw 'reserved dimension found for: \'$k:$v\'';
@@ -87,8 +88,8 @@ abstract class Dimensions {
 Usage get sylphUsage => Usage.instance;
 
 final Map<String, String> _reservedDimensions = {
-  'sessionHostOsDetails':'cd1' ,
-  'localTime':'cd2'
+  'sessionHostOsDetails': 'cd1',
+  'localTime': 'cd2'
 };
 
 abstract class Usage {
@@ -103,9 +104,9 @@ abstract class Usage {
 //    Dimensions customDimensions,
     String analyticsUA,
     String settingsName, {
-    String versionOverride,
-    String configDirOverride,
-    String logFile,
+    String? versionOverride,
+    String? configDirOverride,
+    String? logFile,
   }) {
     return _DefaultUsage(
 //      customDimensions,
@@ -123,7 +124,7 @@ abstract class Usage {
   /// Uses the global [Usage] instance to send a 'command' to analytics.
   static void command(
     String command, {
-    Map<String, String> parameters,
+    Map<String, String>? parameters,
   }) =>
       sylphUsage.sendCommand(command, parameters: parameters);
 
@@ -156,7 +157,7 @@ abstract class Usage {
   ///
   /// Note that using [command] above is preferred to ensure that the parameter
   /// keys are well-defined in [CustomDimensions] above.
-  void sendCommand(String command, {Map<String, String> parameters});
+  void sendCommand(String command, {Map<String, String>? parameters});
 
   /// Sends an 'event' to the underlying analytics implementation.
   ///
@@ -165,11 +166,11 @@ abstract class Usage {
   @visibleForOverriding
   @visibleForTesting
   void sendEvent(String category, String parameter,
-      {Map<String, String> parameters});
+      {Map<String, String>? parameters});
 
   /// Sends timing information to the underlying analytics implementation.
   void sendTiming(String category, String variableName, Duration duration,
-      {String label});
+      {String? label});
 
   /// Sends an exception to the underlying analytics implementation.
   void sendException(dynamic exception);
@@ -192,18 +193,18 @@ class _DefaultUsage implements Usage {
 //    Dimensions customDimensions,
     String analyticsUA,
     String settingsName, {
-    String versionOverride,
-    String configDirOverride,
-    String logFile,
+    String? versionOverride,
+    String? configDirOverride,
+    String? logFile,
 //      }) : this.customDimensions = customDimensions {
-  })  {
+  }) {
 //    final FlutterVersion flutterVersion = FlutterVersion.instance;
 //    final String version = versionOverride ?? flutterVersion.getVersionString(redactUnknownBranches: true);
     final String version = '0.6.0'; // todo: replace with actual
 
     final bool suppressEnvFlag =
         platform.environment['FLUTTER_SUPPRESS_ANALYTICS'] == 'true';
-    final String logFilePath =
+    final String? logFilePath =
         logFile ?? platform.environment['FLUTTER_ANALYTICS_LOG_FILE'];
     final bool usingLogFile = logFilePath != null && logFilePath.isNotEmpty;
 
@@ -236,12 +237,11 @@ class _DefaultUsage implements Usage {
             configDirOverride != null ? fs.directory(configDirOverride) : null,
       );
     }
-    assert(_analytics != null);
 
     // Report a more detailed OS version string than package:usage does by default.
     _analytics.setSessionValue(
 //        cdKey(CustomDimensions.sessionHostOsDetails), os.name);
-        _reservedDimensions['sessionHostOsDetails'],
+        _reservedDimensions['sessionHostOsDetails']!,
         os.name);
     // Send the branch name as the "channel".
 //    _analytics.setSessionValue(cdKey(CustomDimensions.sessionChannelName),
@@ -264,7 +264,7 @@ class _DefaultUsage implements Usage {
     _analytics.analyticsOpt = AnalyticsOpt.optOut;
   }
 
-  Analytics _analytics;
+  late Analytics _analytics;
 
   bool _printedWelcome = false;
   bool _suppressAnalytics = false;
@@ -292,7 +292,7 @@ class _DefaultUsage implements Usage {
   String get clientId => _analytics.clientId;
 
   @override
-  void sendCommand(String command, {Map<String, String> parameters}) {
+  void sendCommand(String command, {Map<String, String>? parameters}) {
     if (suppressAnalytics) {
       return;
     }
@@ -300,7 +300,7 @@ class _DefaultUsage implements Usage {
     final Map<String, String> paramsWithLocalTime = <String, String>{
       ...?parameters,
 //      cdKey(CustomDimensions.localTime): formatDateTime(systemClock.now()),
-      _reservedDimensions['localTime']: formatDateTime(systemClock.now()),
+      _reservedDimensions['localTime']!: formatDateTime(systemClock.now()),
     };
     _analytics.sendScreenView(command, parameters: paramsWithLocalTime);
   }
@@ -309,9 +309,8 @@ class _DefaultUsage implements Usage {
   void sendEvent(
     String category,
     String parameter, {
-    Map<String, String> parameters,
+    Map<String, String>? parameters,
   }) {
-
     if (suppressAnalytics) {
       return;
     }
@@ -319,7 +318,7 @@ class _DefaultUsage implements Usage {
     final Map<String, String> paramsWithLocalTime = <String, String>{
       ...?parameters,
 //      cdKey(CustomDimensions.localTime): formatDateTime(systemClock.now()),
-      _reservedDimensions['localTime']: formatDateTime(systemClock.now()),
+      _reservedDimensions['localTime']!: formatDateTime(systemClock.now()),
     };
 
     _analytics.sendEvent(category, parameter, parameters: paramsWithLocalTime);
@@ -330,9 +329,8 @@ class _DefaultUsage implements Usage {
     String category,
     String variableName,
     Duration duration, {
-    String label,
+    String? label,
   }) {
-
     if (suppressAnalytics) {
       return;
     }
@@ -418,7 +416,7 @@ class LogToFileAnalytics extends AnalyticsMock {
   @override
   Future<void> sendScreenView(
     String viewName, {
-    Map<String, String> parameters,
+    Map<String, String>? parameters,
   }) {
     if (!enabled) {
       return Future<void>.value(null);
@@ -434,7 +432,7 @@ class LogToFileAnalytics extends AnalyticsMock {
 
   @override
   Future<void> sendEvent(String category, String action,
-      {String label, int value, Map<String, String> parameters}) {
+      {String? label, int? value, Map<String, String>? parameters}) {
     if (!enabled) {
       return Future<void>.value(null);
     }
@@ -448,7 +446,7 @@ class LogToFileAnalytics extends AnalyticsMock {
 
   @override
   Future<void> sendTiming(String variableName, int time,
-      {String category, String label}) {
+      {String? category, String? label}) {
     if (!enabled) {
       return Future<void>.value(null);
     }

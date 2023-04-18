@@ -35,13 +35,15 @@ class CustomDimensions extends Dimensions {
     'commandRunProjectHostLanguage': 'cd7',
   };
 
-  String get commandHasTerminal => dimensions['commandHasTerminal'];
+  String get commandHasTerminal => dimensions!['commandHasTerminal']!;
 
-  String get commandRunIsEmulator => dimensions['commandRunIsEmulator'];
+  String get commandRunIsEmulator => dimensions!['commandRunIsEmulator']!;
 
-  String get commandRunTargetName => dimensions['commandRunTargetName'];
+  String get commandRunTargetName => dimensions!['commandRunTargetName']!;
 
-  String get commandRunTargetOsVersion => dimensions['commandRunTargetOsVersion'];
+  String get commandRunTargetOsVersion =>
+      dimensions!['commandRunTargetOsVersion']!;
 
-  String get commandRunProjectHostLanguage => dimensions['commandRunProjectHostLanguage'];
+  String get commandRunProjectHostLanguage =>
+      dimensions!['commandRunProjectHostLanguage']!;
 }

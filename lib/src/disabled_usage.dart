@@ -21,24 +21,24 @@ class DisabledUsage implements Usage {
   set enabled(bool value) {}
 
   @override
-  String get clientId => null;
+  String get clientId => Uuid().generateV4();
 
   @override
-  void sendCommand(String command, {Map<String, String> parameters}) {}
+  void sendCommand(String command, {Map<String, String>? parameters}) {}
 
   @override
   void sendEvent(String category, String parameter,
-      {Map<String, String> parameters}) {}
+      {Map<String, String>? parameters}) {}
 
   @override
   void sendTiming(String category, String variableName, Duration duration,
-      {String label}) {}
+      {String? label}) {}
 
   @override
   void sendException(dynamic exception) {}
 
   @override
-  Stream<Map<String, dynamic>> get onSend => null;
+  Stream<Map<String, dynamic>> get onSend => AnalyticsMock().onSend;
 
   @override
   Future<void> ensureAnalyticsSent() => Future<void>.value();

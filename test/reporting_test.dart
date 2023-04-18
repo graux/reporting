@@ -31,11 +31,11 @@ main() {
     testUsingContext('send command', () async {});
   });
   group('analytics with mocks', () {
-    MemoryFileSystem memoryFileSystem;
-    MockStdio mockStdio;
-    Usage mockUsage;
-    SystemClock mockClock;
-    List<int> mockTimes;
+    late MemoryFileSystem memoryFileSystem;
+    late MockStdio mockStdio;
+    late Usage mockUsage;
+    late SystemClock mockClock;
+    late List<int> mockTimes;
 
     setUp(() {
       memoryFileSystem = MemoryFileSystem();

@@ -22,10 +22,10 @@ import 'src/mocks.dart';
 
 void main() {
   group('analytics', () {
-    Directory tempDir;
-    MockFlutterConfig mockFlutterConfig;
-    SystemClock mockClock;
-    List<int> mockTimes;
+    late Directory tempDir;
+    late MockFlutterConfig mockFlutterConfig;
+    late SystemClock mockClock;
+    late List<int> mockTimes;
 
     setUpAll(() {
 //      Cache.disableLocking();
@@ -150,12 +150,12 @@ void main() {
   });
 
   group('analytics with mocks', () {
-    MemoryFileSystem memoryFileSystem;
-    MockStdio mockStdio;
-    Usage mockUsage;
-    SystemClock mockClock;
+    late MemoryFileSystem memoryFileSystem;
+    late MockStdio mockStdio;
+    late Usage mockUsage;
+    late SystemClock mockClock;
 //    Doctor mockDoctor;
-    List<int> mockTimes;
+    late List<int> mockTimes;
 
     setUp(() {
       memoryFileSystem = MemoryFileSystem();
@@ -275,7 +275,7 @@ void main() {
   });
 
   group('analytics bots', () {
-    Directory tempDir;
+    late Directory tempDir;
 
     setUp(() {
       tempDir = fs.systemTempDirectory
