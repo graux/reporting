@@ -48,18 +48,18 @@ main() {
     });
 
     testUsingContext('command sends localtime', () async {
-      const int kMillis = 1000;
+      const kMillis = 1000;
       mockTimes = <int>[kMillis];
       // Since FLUTTER_ANALYTICS_LOG_FILE is set in the environment, analytics
       // will be written to a file.
-      final Usage usage = Usage(kAnalyticsUA, kSettings,versionOverride: 'test');
+      final usage = Usage(kAnalyticsUA, kSettings, versionOverride: 'test');
       usage.suppressAnalytics = false;
       usage.enabled = true;
 
       usage.sendCommand('test');
 
-      final String log = fs.file('analytics.log').readAsStringSync();
-      final DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(kMillis);
+      final log = fs.file('analytics.log').readAsStringSync();
+      final dateTime = DateTime.fromMillisecondsSinceEpoch(kMillis);
       expect(log.contains(formatDateTime(dateTime)), isTrue);
     }, overrides: <Type, Generator>{
       FileSystem: () => memoryFileSystem,
