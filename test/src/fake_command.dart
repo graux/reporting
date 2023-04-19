@@ -65,7 +65,7 @@ abstract class SylphCommand extends Command<void> {
   /// The currently executing command (or sub-command).
   ///
   /// Will be `null` until the top-most command has begun execution.
-  static SylphCommand get current => context.get<SylphCommand>();
+  static SylphCommand get current => context.get<SylphCommand>()!;
 
   @override
   ArgParser get argParser => _argParser;

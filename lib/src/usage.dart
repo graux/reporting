@@ -119,7 +119,7 @@ abstract class Usage {
   }
 
   /// Returns [Usage] active in the current app context.
-  static Usage get instance => context.get<Usage>();
+  static Usage get instance => context.get<Usage>()!;
 
   /// Uses the global [Usage] instance to send a 'command' to analytics.
   static void command(
